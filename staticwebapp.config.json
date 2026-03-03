@@ -1,0 +1,53 @@
+{
+  "routes": [
+    {
+      "route": "/.auth/login/github",
+      "statusCode": 404
+    },
+    {
+      "route": "/pending",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/pending.html",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/bot/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/*",
+      "allowedRoles": ["member", "admin"]
+    },
+    {
+      "route": "/*",
+      "allowedRoles": ["member", "admin"],
+      "rewrite": "/index.html"
+    }
+  ],
+  "responseOverrides": {
+    "401": {
+      "statusCode": 302,
+      "redirect": "/.auth/login/aad"
+    },
+    "403": {
+      "statusCode": 302,
+      "redirect": "/pending"
+    }
+  },
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*", "/pending", "/pending.html", "/*.{css,scss,js,png,gif,ico,jpg,svg,woff,woff2,ttf,eot}"]
+  },
+  "globalHeaders": {
+    "content-security-policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:"
+  },
+  "mimeTypes": {
+    ".json": "application/json",
+    ".js": "text/javascript"
+  },
+  "platform": {
+    "apiRuntime": "node:18"
+  }
+}

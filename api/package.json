@@ -1,0 +1,19 @@
+{
+  "name": "dadjokes-dkp-api",
+  "version": "1.0.0",
+  "description": "Azure Functions API for DKP Management System",
+  "main": "index.js",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet\"",
+    "merge:players:dry": "node scripts/mergeDuplicatePlayers.js",
+    "merge:players:apply": "node scripts/mergeDuplicatePlayers.js --apply"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.0.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
