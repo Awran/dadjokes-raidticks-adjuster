@@ -57,7 +57,7 @@ export const api = {
   },
 
   login: () => {
-    window.location.href = '/.auth/login/github?post_login_redirect_uri=/'
+    window.location.href = '/.auth/login/aad?post_login_redirect_uri=/'
   },
 
   logout: () => {
