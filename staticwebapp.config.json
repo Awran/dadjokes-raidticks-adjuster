@@ -1,6 +1,10 @@
 {
   "routes": [
     {
+      "route": "/.auth/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/pending",
       "allowedRoles": ["anonymous"]
     },
@@ -18,8 +22,7 @@
     },
     {
       "route": "/*",
-      "allowedRoles": ["member", "admin"],
-      "rewrite": "/index.html"
+      "allowedRoles": ["member", "admin"]
     }
   ],
   "responseOverrides": {
