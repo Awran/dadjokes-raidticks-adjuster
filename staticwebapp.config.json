@@ -5,6 +5,14 @@
       "allowedRoles": ["anonymous"]
     },
     {
+      "route": "/assets/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/*.{css,scss,js,png,gif,ico,jpg,svg,woff,woff2,ttf,eot}",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/pending",
       "allowedRoles": ["anonymous"]
     },
