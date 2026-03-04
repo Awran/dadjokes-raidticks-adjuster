@@ -20,7 +20,10 @@ jobs:
           submodules: true
 
       - name: Build App
+        env:
+          VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
         run: |
+          export VITE_AUTH_PROVIDER="${VITE_AUTH_PROVIDER:-discord}"
           npm install
           npm run build
 
