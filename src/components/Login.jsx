@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 
-const AUTH_PROVIDER = String(import.meta.env.VITE_AUTH_PROVIDER || 'swa').toLowerCase()
+const AUTH_PROVIDER = String(import.meta.env.VITE_AUTH_PROVIDER || 'discord').toLowerCase()
 const IS_DISCORD_LOGIN = AUTH_PROVIDER === 'discord' || AUTH_PROVIDER === 'hybrid'
 
 const Login = ({ onSuccess }) => {

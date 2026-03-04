@@ -1,5 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
-const AUTH_PROVIDER = String(import.meta.env.VITE_AUTH_PROVIDER || 'swa').toLowerCase()
+const AUTH_PROVIDER = String(import.meta.env.VITE_AUTH_PROVIDER || 'discord').toLowerCase()
 
 const isDiscordAuth = AUTH_PROVIDER === 'discord'
 const isHybridAuth = AUTH_PROVIDER === 'hybrid'

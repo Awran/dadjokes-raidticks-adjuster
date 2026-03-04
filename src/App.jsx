@@ -10,6 +10,9 @@ import { useAuth } from './context/AuthContext'
 import { api } from './utils/api'
 import logo from './assets/dadjokes-raidticks.png'
 
+const AUTH_PROVIDER = String(import.meta.env.VITE_AUTH_PROVIDER || 'discord').toLowerCase()
+const AUTO_PROMPT_LOGIN = AUTH_PROVIDER === 'discord' || AUTH_PROVIDER === 'hybrid'
+
 function App() {
   const [backupData, setBackupData] = useState(null)
   const [errors, setErrors] = useState([])
@@ -19,13 +22,19 @@ function App() {
   const [showLogin, setShowLogin] = useState(false)
   const [selectedPlayerId, setSelectedPlayerId] = useState(null)
   const [selectedRaidId, setSelectedRaidId] = useState(null)
-  const { isAuthenticated, isAdmin, logout, user, accessDenied } = useAuth()
+  const { isAuthenticated, isAdmin, logout, user, accessDenied, loading } = useAuth()
 
   useEffect(() => {
     if (accessDenied && !isAuthenticated) {
       setShowLogin(true)
     }
   }, [accessDenied, isAuthenticated])
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated && AUTO_PROMPT_LOGIN) {
+      setShowLogin(true)
+    }
+  }, [loading, isAuthenticated])
 
   const hasBackup = !!backupData
 
