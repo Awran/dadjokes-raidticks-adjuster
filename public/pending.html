@@ -71,16 +71,34 @@
   </head>
   <body>
     <main class="card">
-      <h1>Access pending approval</h1>
-      <p>You are signed in, but your account has not been granted access to this site yet.</p>
-      <p>An administrator needs to map one of your Discord roles to the app <code>member</code> or <code>admin</code> role.</p>
-      <p>After approval, refresh this page or click Return to App.</p>
+      <h1 id="pending-title">Access pending approval</h1>
+      <p id="pending-line-1">You are signed in, but your account has not been granted access to this site yet.</p>
+      <p id="pending-line-2">An administrator needs to map one of your Discord roles to the app <code>member</code> or <code>admin</code> role.</p>
+      <p id="pending-line-3">After approval, refresh this page or click Return to App.</p>
       <div class="actions">
+        <a id="discord-invite-link" class="button" href="https://discord.dadjokes.red" target="_blank" rel="noopener noreferrer" style="display: none;">Join Discord</a>
         <a class="button primary" href="/">Return to App</a>
         <a id="signout-link" class="button" href="#">Sign out</a>
       </div>
     </main>
     <script>
+      const params = new URLSearchParams(window.location.search)
+      const reason = params.get('reason')
+
+      const titleEl = document.getElementById('pending-title')
+      const line1El = document.getElementById('pending-line-1')
+      const line2El = document.getElementById('pending-line-2')
+      const line3El = document.getElementById('pending-line-3')
+      const inviteLinkEl = document.getElementById('discord-invite-link')
+
+      if (reason === 'not-in-guild') {
+        titleEl.textContent = 'Join DadJokes Discord first'
+        line1El.textContent = 'Your Discord account is not currently a member of the DadJokes Discord server.'
+        line2El.innerHTML = 'Join the server, then have an admin map one of your Discord roles to app <code>member</code> or <code>admin</code>.'
+        line3El.textContent = 'After joining and being assigned a role, return to the app and sign in again.'
+        inviteLinkEl.style.display = 'inline-block'
+      }
+
       const signOutLink = document.getElementById('signout-link')
       signOutLink?.addEventListener('click', async (event) => {
         event.preventDefault()

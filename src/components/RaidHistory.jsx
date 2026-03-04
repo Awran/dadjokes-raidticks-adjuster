@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../utils/api'
+import { formatDateTime } from '../utils/time'
 
-const RaidHistory = ({ onSelectRaid }) => {
+const RaidHistory = ({ onSelectRaid = null, isReadOnly = false }) => {
   const [raids, setRaids] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -72,13 +73,13 @@ const RaidHistory = ({ onSelectRaid }) => {
               <th>Raid Name</th>
               <th>Attendance</th>
               <th>Source</th>
-              <th>Actions</th>
+              {!isReadOnly && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
             {raids.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center">
+                <td colSpan={isReadOnly ? '4' : '5'} className="text-center">
                   No raids found. Upload a raid to get started!
                 </td>
               </tr>
@@ -86,7 +87,7 @@ const RaidHistory = ({ onSelectRaid }) => {
               raids.map((raid) => (
                 <tr key={raid.id}>
                   <td>
-                    {new Date(raid.date || raid.createdAt).toLocaleString()}
+                    {formatDateTime(raid.date || raid.createdAt)}
                   </td>
                   <td>
                     <strong>{raid.name || 'Unnamed Raid'}</strong>
@@ -95,21 +96,23 @@ const RaidHistory = ({ onSelectRaid }) => {
                   <td className="text-muted">
                     {raid.source === 'discord_bot' ? '🤖 Discord Bot' : '📊 Manual Upload'}
                   </td>
-                  <td>
-                    <button
-                      className="button button--small"
-                      onClick={() => onSelectRaid(raid.id)}
-                    >
-                      View/Edit
-                    </button>
-                    <button
-                      className="button button--small button--danger"
-                      onClick={() => handleDeleteRaid(raid.id, raid.name || 'Unnamed Raid')}
-                      style={{ marginLeft: '8px' }}
-                    >
-                      Delete
-                    </button>
-                  </td>
+                  {!isReadOnly && (
+                    <td>
+                      <button
+                        className="button button--small"
+                        onClick={() => onSelectRaid?.(raid.id)}
+                      >
+                        View/Edit
+                      </button>
+                      <button
+                        className="button button--small button--danger"
+                        onClick={() => handleDeleteRaid(raid.id, raid.name || 'Unnamed Raid')}
+                        style={{ marginLeft: '8px' }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             )}

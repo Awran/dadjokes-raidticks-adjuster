@@ -126,6 +126,12 @@ Frontend feature flag:
 - `VITE_AUTH_PROVIDER=swa|hybrid|discord`
 - Use `discord` to fully test Discord login UX, `hybrid` for Discord-first with SWA fallback, and `swa` for current behavior.
 
+Timestamp display setting:
+
+- `VITE_TIMEZONE_MODE=local|est`
+- `local` uses each user browser timezone (default)
+- `est` standardizes display to America/New_York (EST/EDT)
+
 Mode alignment (set frontend + API together):
 
 - `discord`: production Discord-only mode

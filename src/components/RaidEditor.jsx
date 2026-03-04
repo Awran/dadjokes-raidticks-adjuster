@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../utils/api'
+import { formatDateTime, formatTime } from '../utils/time'
 
 const buildMassAwardParticipants = (transactions = []) => {
   const baseTransactions = transactions.filter(
@@ -270,7 +271,7 @@ const RaidEditor = ({ raidId, onBack }) => {
           </button>
           <h2>{raid.name || 'Unnamed Raid'}</h2>
           <p>
-            {new Date(raid.date || raid.createdAt).toLocaleString()} • 
+            {formatDateTime(raid.date || raid.createdAt)} • 
             {raid.transactions?.length || 0} transactions • 
             Total DKP: {totalDkp.toFixed(1)}
           </p>
@@ -446,7 +447,7 @@ const RaidEditor = ({ raidId, onBack }) => {
               ledgerRows.map((row) => (
                 <tr key={row.id} className={row.kind === 'adjustment' ? 'ledger-row--adjustment' : ''}>
                   <td className="text-muted">
-                    {new Date(row.timestamp).toLocaleTimeString()}
+                    {formatTime(row.timestamp)}
                   </td>
                   <td>
                     {row.kind === 'adjustment'

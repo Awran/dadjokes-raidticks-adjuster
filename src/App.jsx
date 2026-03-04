@@ -206,7 +206,7 @@ function App() {
             Upload Raid
           </button>
         )}
-        {isAdmin && (
+        {isAuthenticated && (
           <button
             type="button"
             className={`tab ${activeTab === 'history' ? 'tab--active' : ''}`}
@@ -302,15 +302,18 @@ function App() {
         </>
       )}
 
-      {activeTab === 'history' && isAdmin && (
+      {activeTab === 'history' && isAuthenticated && (
         <section>
-          {selectedRaidId ? (
+          {isAdmin && selectedRaidId ? (
             <RaidEditor 
               raidId={selectedRaidId} 
               onBack={() => setSelectedRaidId(null)} 
             />
           ) : (
-            <RaidHistory onSelectRaid={setSelectedRaidId} />
+            <RaidHistory
+              onSelectRaid={isAdmin ? setSelectedRaidId : null}
+              isReadOnly={!isAdmin}
+            />
           )}
         </section>
       )}

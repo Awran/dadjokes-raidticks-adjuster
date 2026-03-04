@@ -43,11 +43,27 @@ module.exports = async function (context, req) {
   } catch (error) {
     context.log.error('Discord callback failed', error)
 
-    if (String(error?.message || '').toLowerCase().includes('access denied')) {
+    const errorMessage = String(error?.message || '').toLowerCase()
+
+    if (
+      errorMessage.includes('unknown member') ||
+      errorMessage.includes('guild membership')
+    ) {
       context.res = {
         status: 302,
         headers: {
-          Location: '/pending',
+          Location: '/pending?reason=not-in-guild',
+          'Cache-Control': 'no-store'
+        }
+      }
+      return
+    }
+
+    if (errorMessage.includes('access denied')) {
+      context.res = {
+        status: 302,
+        headers: {
+          Location: '/pending?reason=not-approved',
           'Cache-Control': 'no-store'
         }
       }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../utils/api'
+import { formatDateTime } from '../utils/time'
 
 const AuctionWinsHistory = () => {
   const [data, setData] = useState({ itemCount: 0, items: [] })
@@ -65,7 +66,7 @@ const AuctionWinsHistory = () => {
             <tbody>
               {item.wins.map((win) => (
                 <tr key={win.id}>
-                  <td className="text-muted">{new Date(win.timestamp).toLocaleString()}</td>
+                  <td className="text-muted">{formatDateTime(win.timestamp)}</td>
                   <td className="text-muted">{win.raidName || '-'}</td>
                   <td>{win.winner || '-'}</td>
                   <td className="text-right"><strong>{Number(win.winningBid || 0).toFixed(1)}</strong></td>

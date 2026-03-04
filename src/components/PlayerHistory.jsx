@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../utils/api'
+import { formatDateTime } from '../utils/time'
 
 const PlayerHistory = ({ playerId, onBack, isAdmin = false, onSelectRaid = null }) => {
   const [data, setData] = useState(null)
@@ -211,7 +212,7 @@ const PlayerHistory = ({ playerId, onBack, isAdmin = false, onSelectRaid = null 
               ledgerRows.map((row) => (
                 <tr key={row.id} className={row.isAdjustment ? 'ledger-row--adjustment' : ''}>
                   <td className="text-muted">
-                    {new Date(row.timestamp).toLocaleString()}
+                    {formatDateTime(row.timestamp)}
                   </td>
                   <td>{row.type}</td>
                   <td className="text-muted">{row.adjustedBy}</td>
