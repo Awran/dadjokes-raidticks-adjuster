@@ -6,6 +6,7 @@ import AuctionWinsHistory from './components/AuctionWinsHistory'
 import PlayerHistory from './components/PlayerHistory'
 import RaidHistory from './components/RaidHistory'
 import RaidEditor from './components/RaidEditor'
+import RaidDetails from './components/RaidDetails'
 import { useAuth } from './context/AuthContext'
 import { api } from './utils/api'
 import logo from './assets/dadjokes-raidticks.png'
@@ -304,14 +305,21 @@ function App() {
 
       {activeTab === 'history' && isAuthenticated && (
         <section>
-          {isAdmin && selectedRaidId ? (
-            <RaidEditor 
-              raidId={selectedRaidId} 
-              onBack={() => setSelectedRaidId(null)} 
-            />
+          {selectedRaidId ? (
+            isAdmin ? (
+              <RaidEditor
+                raidId={selectedRaidId}
+                onBack={() => setSelectedRaidId(null)}
+              />
+            ) : (
+              <RaidDetails
+                raidId={selectedRaidId}
+                onBack={() => setSelectedRaidId(null)}
+              />
+            )
           ) : (
             <RaidHistory
-              onSelectRaid={isAdmin ? setSelectedRaidId : null}
+              onSelectRaid={setSelectedRaidId}
               isReadOnly={!isAdmin}
             />
           )}

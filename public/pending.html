@@ -97,6 +97,12 @@
         line2El.innerHTML = 'Join the server, then have an admin map one of your Discord roles to app <code>member</code> or <code>admin</code>.'
         line3El.textContent = 'After joining and being assigned a role, return to the app and sign in again.'
         inviteLinkEl.style.display = 'inline-block'
+      } else if (reason === 'guild-unavailable') {
+        titleEl.textContent = 'Unable to verify Discord server membership'
+        line1El.textContent = 'We could not verify your membership for the configured DadJokes Discord server.'
+        line2El.innerHTML = 'If you are not in the server yet, join first. If you are already in it, ask an admin to verify the configured guild and role mapping IDs.'
+        line3El.textContent = 'After joining or after configuration is corrected, return to the app and sign in again.'
+        inviteLinkEl.style.display = 'inline-block'
       }
 
       const signOutLink = document.getElementById('signout-link')

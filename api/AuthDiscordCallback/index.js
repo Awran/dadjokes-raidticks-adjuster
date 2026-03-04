@@ -47,12 +47,13 @@ module.exports = async function (context, req) {
 
     if (
       errorMessage.includes('unknown member') ||
+      errorMessage.includes('unknown guild') ||
       errorMessage.includes('guild membership')
     ) {
       context.res = {
         status: 302,
         headers: {
-          Location: '/pending?reason=not-in-guild',
+          Location: '/pending?reason=guild-unavailable',
           'Cache-Control': 'no-store'
         }
       }

@@ -73,13 +73,13 @@ const RaidHistory = ({ onSelectRaid = null, isReadOnly = false }) => {
               <th>Raid Name</th>
               <th>Attendance</th>
               <th>Source</th>
-              {!isReadOnly && <th>Actions</th>}
+              {onSelectRaid && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
             {raids.length === 0 ? (
               <tr>
-                <td colSpan={isReadOnly ? '4' : '5'} className="text-center">
+                <td colSpan={onSelectRaid ? '5' : '4'} className="text-center">
                   No raids found. Upload a raid to get started!
                 </td>
               </tr>
@@ -96,21 +96,23 @@ const RaidHistory = ({ onSelectRaid = null, isReadOnly = false }) => {
                   <td className="text-muted">
                     {raid.source === 'discord_bot' ? '🤖 Discord Bot' : '📊 Manual Upload'}
                   </td>
-                  {!isReadOnly && (
+                  {onSelectRaid && (
                     <td>
                       <button
                         className="button button--small"
                         onClick={() => onSelectRaid?.(raid.id)}
                       >
-                        View/Edit
+                        {isReadOnly ? 'View' : 'View/Edit'}
                       </button>
-                      <button
-                        className="button button--small button--danger"
-                        onClick={() => handleDeleteRaid(raid.id, raid.name || 'Unnamed Raid')}
-                        style={{ marginLeft: '8px' }}
-                      >
-                        Delete
-                      </button>
+                      {!isReadOnly && (
+                        <button
+                          className="button button--small button--danger"
+                          onClick={() => handleDeleteRaid(raid.id, raid.name || 'Unnamed Raid')}
+                          style={{ marginLeft: '8px' }}
+                        >
+                          Delete
+                        </button>
+                      )}
                     </td>
                   )}
                 </tr>
