@@ -504,6 +504,16 @@ textarea {
   margin-top: 16px;
 }
 
+.player-name {
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.player-name:hover {
+  text-decoration: underline;
+}
+
 .leaderboard table {
   font-variant-numeric: tabular-nums;
 }

@@ -91,13 +91,12 @@ const DkpLeaderboard = ({ isAdmin = false, onSelectPlayer }) => {
                 <tr key={player.id}>
                   <td>{index + 1}</td>
                   <td>
-                    <button
-                      type="button"
-                      className="button button--ghost"
+                    <span
+                      className="player-name"
                       onClick={() => onSelectPlayer?.(player.id)}
                     >
-                      <strong>{player.characterName || player.id}</strong>
-                    </button>
+                      {player.characterName || player.id}
+                    </span>
                   </td>
                   <td className="text-right">
                     <strong>{(player.dkpBalance || 0).toFixed(1)}</strong>
