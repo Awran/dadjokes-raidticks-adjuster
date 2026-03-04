@@ -73,12 +73,25 @@
     <main class="card">
       <h1>Access pending approval</h1>
       <p>You are signed in, but your account has not been granted access to this site yet.</p>
-      <p>An administrator needs to assign your account to the <code>member</code> or <code>admin</code> role in Azure Static Web Apps.</p>
+      <p>An administrator needs to map one of your Discord roles to the app <code>member</code> or <code>admin</code> role.</p>
       <p>After approval, refresh this page or click Return to App.</p>
       <div class="actions">
         <a class="button primary" href="/">Return to App</a>
-        <a class="button" href="/.auth/logout?post_logout_redirect_uri=/">Sign out</a>
+        <a id="signout-link" class="button" href="#">Sign out</a>
       </div>
     </main>
+    <script>
+      const signOutLink = document.getElementById('signout-link')
+      signOutLink?.addEventListener('click', async (event) => {
+        event.preventDefault()
+        try {
+          await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+        } catch (_) {
+          // ignore and continue to SWA logout fallback
+        }
+
+        window.location.href = '/.auth/logout?post_logout_redirect_uri=/'
+      })
+    </script>
   </body>
 </html>

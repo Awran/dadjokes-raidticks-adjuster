@@ -13,13 +13,27 @@ const normalizeRoles = (roles) =>
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [accessDenied, setAccessDenied] = useState(false)
+  const [accessDeniedMessage, setAccessDeniedMessage] = useState('')
 
   useEffect(() => {
     const bootstrapAuth = async () => {
       try {
         const principal = await api.getCurrentUser()
         setUser(principal || null)
+        setAccessDenied(false)
+        setAccessDeniedMessage('')
       } catch (_error) {
+        if (_error?.status === 403) {
+          setAccessDenied(true)
+          setAccessDeniedMessage(_error.message || 'Access denied: member role required')
+          if (typeof window !== 'undefined' && window.location.pathname !== '/pending') {
+            window.location.href = '/pending'
+          }
+        } else {
+          setAccessDenied(false)
+          setAccessDeniedMessage('')
+        }
         setUser(null)
       } finally {
         setLoading(false)
@@ -30,12 +44,19 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = async () => {
+    setAccessDenied(false)
+    setAccessDeniedMessage('')
     api.login()
   }
 
-  const logout = () => {
-    api.logout()
-    setUser(null)
+  const logout = async () => {
+    try {
+      await api.logout()
+    } finally {
+      setUser(null)
+      setAccessDenied(false)
+      setAccessDeniedMessage('')
+    }
   }
 
   const value = {
@@ -43,6 +64,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     loading,
+    accessDenied,
+    accessDeniedMessage,
     isAuthenticated: !!user,
     isAdmin: normalizeRoles(user?.userRoles).includes('admin')
   }

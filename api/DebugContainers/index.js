@@ -1,8 +1,14 @@
 require('../lib/ensureCrypto')
 const { CosmosClient } = require('@azure/cosmos')
+const { requireAdminRole } = require('../lib/swaAuth')
 
 module.exports = async function (context, req) {
   try {
+    const principal = requireAdminRole(context, req)
+    if (!principal) {
+      return
+    }
+
     const endpoint = process.env.COSMOS_ENDPOINT
     const key = process.env.COSMOS_KEY
     const databaseId = process.env.COSMOS_DATABASE_ID || 'DkpDatabase'

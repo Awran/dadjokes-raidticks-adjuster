@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import FileLoader from './components/FileLoader'
 import Login from './components/Login'
 import DkpLeaderboard from './components/DkpLeaderboard'
@@ -19,7 +19,13 @@ function App() {
   const [showLogin, setShowLogin] = useState(false)
   const [selectedPlayerId, setSelectedPlayerId] = useState(null)
   const [selectedRaidId, setSelectedRaidId] = useState(null)
-  const { isAuthenticated, isAdmin, logout, user } = useAuth()
+  const { isAuthenticated, isAdmin, logout, user, accessDenied } = useAuth()
+
+  useEffect(() => {
+    if (accessDenied && !isAuthenticated) {
+      setShowLogin(true)
+    }
+  }, [accessDenied, isAuthenticated])
 
   const hasBackup = !!backupData
 

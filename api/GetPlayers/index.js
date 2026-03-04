@@ -1,5 +1,6 @@
 require('../lib/ensureCrypto')
 const { CosmosClient } = require('@azure/cosmos')
+const { requireMemberRole } = require('../lib/swaAuth')
 
 let cosmosClient, playersContainer
 
@@ -22,6 +23,11 @@ function initCosmos() {
 
 module.exports = async function (context, req) {
   try {
+    const principal = requireMemberRole(context, req)
+    if (!principal) {
+      return
+    }
+
     const container = initCosmos()
     
     const { resources: players } = await container.items

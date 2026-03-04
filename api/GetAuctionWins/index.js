@@ -1,5 +1,6 @@
 require('../lib/ensureCrypto')
 const { CosmosClient } = require('@azure/cosmos')
+const { requireMemberRole } = require('../lib/swaAuth')
 
 let cosmosClient, transactionsContainer, raidsContainer
 
@@ -87,6 +88,11 @@ async function getRaidNameMap(transactions, raidsContainerRef) {
 
 module.exports = async function (context, _req) {
   try {
+    const principal = requireMemberRole(context, _req)
+    if (!principal) {
+      return
+    }
+
     const containers = initCosmos()
 
     const { resources: transactions } = await containers.transactionsContainer.items

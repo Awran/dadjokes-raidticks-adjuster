@@ -1,4 +1,31 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+const AUTH_PROVIDER = String(import.meta.env.VITE_AUTH_PROVIDER || 'swa').toLowerCase()
+
+const isDiscordAuth = AUTH_PROVIDER === 'discord'
+const isHybridAuth = AUTH_PROVIDER === 'hybrid'
+
+const getPostLoginRedirect = () => encodeURIComponent(window.location.pathname || '/')
+
+const readClientPrincipal = async (url) => {
+  const response = await fetch(url, { credentials: 'include' })
+  let payload = null
+
+  try {
+    payload = await response.json()
+  } catch {
+    payload = null
+  }
+
+  if (response.status === 403) {
+    throw new ApiError(payload?.error || 'Access denied', 403, payload)
+  }
+
+  if (!response.ok) {
+    return null
+  }
+
+  return payload?.clientPrincipal || null
+}
 
 class ApiError extends Error {
   constructor(message, status, data) {
@@ -23,6 +50,7 @@ const request = async (endpoint, options = {}) => {
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
+    credentials: options.credentials || 'include',
     headers
   })
 
@@ -47,20 +75,48 @@ const request = async (endpoint, options = {}) => {
 export const api = {
   // Auth
   getCurrentUser: async () => {
-    const response = await fetch('/.auth/me', { credentials: 'include' })
-    if (!response.ok) {
-      return null
+    if (isDiscordAuth) {
+      return readClientPrincipal(`${API_BASE_URL}/auth/me`)
     }
-    const payload = await response.json()
-    const principal = payload?.clientPrincipal
-    return principal || null
+
+    if (isHybridAuth) {
+      const discordPrincipal = await readClientPrincipal(`${API_BASE_URL}/auth/me`)
+      if (discordPrincipal) {
+        return discordPrincipal
+      }
+    }
+
+    return readClientPrincipal('/.auth/me')
   },
 
   login: () => {
+    if (isDiscordAuth || isHybridAuth) {
+      window.location.href = `${API_BASE_URL}/auth/discord/login?redirect=${getPostLoginRedirect()}`
+      return
+    }
+
     window.location.href = '/.auth/login/aad?post_login_redirect_uri=/'
   },
 
-  logout: () => {
+  logout: async () => {
+    if (isDiscordAuth) {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+      window.location.href = '/'
+      return
+    }
+
+    if (isHybridAuth) {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+      window.location.href = '/.auth/logout?post_logout_redirect_uri=/'
+      return
+    }
+
     window.location.href = '/.auth/logout?post_logout_redirect_uri=/'
   },
 

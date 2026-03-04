@@ -25,24 +25,18 @@
       "allowedRoles": ["anonymous"]
     },
     {
+      "route": "/api/auth/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/api/*",
-      "allowedRoles": ["member", "admin"]
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/*",
-      "allowedRoles": ["member", "admin"]
+      "allowedRoles": ["anonymous"]
     }
   ],
-  "responseOverrides": {
-    "401": {
-      "statusCode": 302,
-      "redirect": "/.auth/login/aad?post_login_redirect_uri=/"
-    },
-    "403": {
-      "statusCode": 302,
-      "redirect": "/pending"
-    }
-  },
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": ["/api/*", "/pending", "/pending.html", "/*.{css,scss,js,png,gif,ico,jpg,svg,woff,woff2,ttf,eot}"]

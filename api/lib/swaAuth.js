@@ -1,3 +1,5 @@
+const { extractSessionFromRequest } = require('./discordAuth')
+
 function parseClientPrincipal(req) {
   const encoded =
     req?.headers?.['x-ms-client-principal'] ||
@@ -16,6 +18,43 @@ function parseClientPrincipal(req) {
   }
 }
 
+function parseBoolean(value, fallback = false) {
+  if (value === undefined || value === null || value === '') {
+    return fallback
+  }
+
+  const normalized = String(value).trim().toLowerCase()
+  return normalized === 'true' || normalized === '1' || normalized === 'yes'
+}
+
+function getAuthProviderMode() {
+  return String(process.env.AUTH_PROVIDER || 'swa').trim().toLowerCase()
+}
+
+function shouldUseDiscordAuth() {
+  const mode = getAuthProviderMode()
+  return mode === 'discord' || mode === 'hybrid'
+}
+
+function allowSwaFallback() {
+  return parseBoolean(process.env.AUTH_ALLOW_SWA_FALLBACK, true)
+}
+
+function getPrincipal(req) {
+  if (shouldUseDiscordAuth()) {
+    const discordPrincipal = extractSessionFromRequest(req)
+    if (discordPrincipal) {
+      return discordPrincipal
+    }
+
+    if (!allowSwaFallback()) {
+      return null
+    }
+  }
+
+  return parseClientPrincipal(req)
+}
+
 function normalizeRoles(roles) {
   if (!Array.isArray(roles)) {
     return []
@@ -27,7 +66,7 @@ function normalizeRoles(roles) {
 }
 
 function requireAuthenticated(context, req) {
-  const principal = parseClientPrincipal(req)
+  const principal = getPrincipal(req)
   const roles = normalizeRoles(principal?.userRoles)
   const isAuthenticated = roles.includes('authenticated')
 
@@ -35,6 +74,25 @@ function requireAuthenticated(context, req) {
     context.res = {
       status: 401,
       body: { error: 'Authentication required' }
+    }
+    return null
+  }
+
+  return principal
+}
+
+function requireMemberRole(context, req) {
+  const principal = requireAuthenticated(context, req)
+  if (!principal) {
+    return null
+  }
+
+  const roles = normalizeRoles(principal.userRoles)
+  const isMember = roles.includes('member') || roles.includes('admin')
+  if (!isMember) {
+    context.res = {
+      status: 403,
+      body: { error: 'Member access required' }
     }
     return null
   }
@@ -63,5 +121,6 @@ function requireAdminRole(context, req) {
 module.exports = {
   parseClientPrincipal,
   requireAuthenticated,
+  requireMemberRole,
   requireAdminRole
 }

@@ -1,5 +1,7 @@
 # 🚀 Step-by-Step Deployment Guide
 
+This guide uses Discord OAuth with Discord-role-to-app-role mapping.
+
 ## Prerequisites
 - Azure account (free tier works!)
 - GitHub account
@@ -85,9 +87,22 @@ No manual Azure CLI commands required! ✨
 | `COSMOS_ENDPOINT` | URI from Step 1 | `https://dadjokes-dkp.documents.azure.com:443/` |
 | `COSMOS_KEY` | Primary Key from Step 1 | `abc123...` |
 | `COSMOS_DATABASE_ID` | `DkpDatabase` | `DkpDatabase` |
-| `JWT_SECRET` | Any random string (32+ chars) | `my-super-secret-jwt-key-change-me-123456` |
-| `ADMIN_PASSWORD` | Your admin password | `YourSecurePassword123!` |
-| `ADMIN_EMAILS` | Comma-separated admin emails | `you@example.com,admin@guild.com` |
+| `SESSION_SECRET` | Random secret (32+ chars) | `my-super-secret-session-key-change-me-123456` |
+| `AUTH_PROVIDER` | Auth mode | `discord` |
+| `AUTH_ALLOW_SWA_FALLBACK` | SWA fallback toggle | `false` |
+| `SESSION_COOKIE_NAME` | Session cookie name | `dkp_session` |
+| `SESSION_TTL_SECONDS` | Session length in seconds | `43200` |
+| `COOKIE_SAMESITE` | Cookie same-site mode | `Lax` |
+| `COOKIE_SECURE` | HTTPS-only cookie in prod | `true` |
+| `DISCORD_CLIENT_ID` | Discord OAuth app client ID | `123456789012345678` |
+| `DISCORD_CLIENT_SECRET` | Discord OAuth app client secret | `your-discord-secret` |
+| `DISCORD_REDIRECT_URI` | OAuth callback URL | `https://YOUR-APP.azurestaticapps.net/api/auth/discord/callback` |
+| `DISCORD_GUILD_ID` | Discord guild (server) ID | `123456789012345678` |
+| `DISCORD_ADMIN_ROLE_IDS` | Comma-separated admin role IDs | `111111111111111111,222222222222222222` |
+| `DISCORD_MEMBER_ROLE_IDS` | Comma-separated member role IDs | `333333333333333333` |
+| `DISCORD_ALLOW_ANY_GUILD_MEMBER` | Allow any guild member | `false` |
+| `DISCORD_SCOPES` | OAuth scopes | `identify,guilds.members.read` |
+| `VITE_AUTH_PROVIDER` | Frontend auth mode | `discord` |
 | `DKP_API_KEY` | Shared bot API secret | `use-a-long-random-secret` |
 
 3. Click **"Save"** at the top
@@ -141,11 +156,13 @@ To verify:
 ## Step 7: Login & Test
 
 1. Go to your app URL
-2. Login with:
-   - **Email**: One of your `ADMIN_EMAILS`
-   - **Password**: Your `ADMIN_PASSWORD`
-3. Upload a test raid CSV
-4. View the DKP leaderboard
+2. Click **Sign In** and complete Discord OAuth
+3. Confirm behavior:
+   - Mapped `member` role: can access leaderboard and history
+   - Mapped `admin` role: can access upload/edit admin features
+   - No mapped role: redirected to `/pending`
+4. Upload a test raid CSV with an admin account
+5. View the DKP leaderboard with a member account
 
 ---
 
@@ -196,10 +213,12 @@ GET https://YOUR-APP.azurestaticapps.net/api/bot/dkp/{userId}
 - Wait 2-3 minutes after saving config for changes to propagate
 - Check GitHub Actions workflow completed successfully (green checkmark ✅)
 
-### "Invalid credentials" on login
+### Access denied after Discord login
 
-- Verify email matches one in `ADMIN_EMAILS` configuration
-- Check `ADMIN_PASSWORD` is correct in Configuration
+- Verify `DISCORD_GUILD_ID` matches your Discord guild (server) ID
+- Verify `DISCORD_ADMIN_ROLE_IDS` and `DISCORD_MEMBER_ROLE_IDS` contain correct role IDs
+- Verify frontend/backend mode alignment: `VITE_AUTH_PROVIDER=discord` and `AUTH_PROVIDER=discord`
+- Confirm callback URI in Discord app matches `DISCORD_REDIRECT_URI`
 
 ### Database errors in app
 
@@ -222,5 +241,5 @@ With the setup above:
 
 - Set up custom domain (optional)
 - Configure your Discord bot to use the API
-- Add more admin users to `ADMIN_EMAILS`
+- Update Discord role mappings as guild roles change
 - Monitor usage in Azure Portal

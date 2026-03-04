@@ -6,7 +6,7 @@ A full-stack DKP (Dragon Kill Points) management system for guild raid tracking,
 
 - 📊 **DKP Leaderboard** - Real-time view of all player DKP balances
 - 📤 **Raid Upload** - Admin interface to upload raid attendance with adjustments
-- 🔐 **Authentication** - Secure admin login system
+- 🔐 **Authentication** - Discord OAuth with role-based member/admin access
 - 📜 **Transaction History** - Track all DKP awards and changes
 - 🤖 **Bot API** - Simple REST endpoints for Discord bot integration
 - 💰 **Bid Tracking** - Record and view item bids
@@ -21,7 +21,7 @@ A full-stack DKP (Dragon Kill Points) management system for guild raid tracking,
 ### Backend
 - **Azure Functions** (Node.js, serverless)
 - **Azure Cosmos DB** (Free tier - NoSQL)
-- REST API with JWT authentication
+- REST API with Discord session auth and role-based authorization
 
 ### Cost: $0-2/month for 30 users
 
@@ -126,10 +126,23 @@ Go to Azure Portal → Your Static Web App → Configuration
 Add:
 - `COSMOS_ENDPOINT`
 - `COSMOS_KEY`
-- `COSMOS_DATABASE`
-- `JWT_SECRET`
-- `ADMIN_PASSWORD`
-- `ADMIN_EMAILS`
+- `COSMOS_DATABASE_ID`
+- `SESSION_SECRET`
+- `AUTH_PROVIDER` (`discord`, `hybrid`, `swa`)
+- `AUTH_ALLOW_SWA_FALLBACK`
+- `SESSION_COOKIE_NAME`
+- `SESSION_TTL_SECONDS`
+- `COOKIE_SAMESITE`
+- `COOKIE_SECURE`
+- `DISCORD_CLIENT_ID`
+- `DISCORD_CLIENT_SECRET`
+- `DISCORD_REDIRECT_URI`
+- `DISCORD_GUILD_ID`
+- `DISCORD_ADMIN_ROLE_IDS`
+- `DISCORD_MEMBER_ROLE_IDS`
+- `DISCORD_ALLOW_ANY_GUILD_MEMBER`
+- `DISCORD_SCOPES`
+- `VITE_AUTH_PROVIDER` (`discord`, `hybrid`, `swa`)
 - `DKP_API_KEY` (must match bot-side `DKP_API_KEY` for Discord integration)
 
 3. **Push to GitHub - deploys automatically via GitHub Actions!**
@@ -152,14 +165,23 @@ Changes deploy within 2-5 minutes. No manual Azure CLI commands needed.
 
 ## API Endpoints
 
-### Public Endpoints
+### Auth Endpoints
+
+```
+GET  /api/auth/discord/login   # Start Discord OAuth
+GET  /api/auth/discord/callback # OAuth callback + session cookie
+GET  /api/auth/me              # Resolve current principal
+POST /api/auth/logout          # Clear current session
+```
+
+### Member Endpoints (requires `member` or `admin`)
 
 ```
 GET  /api/players           # Get all players and DKP balances
 GET  /api/players/{id}      # Get player details and transactions
 GET  /api/raids             # Get raid history
-GET  /api/bids/{raidId}     # Get bids for a raid
-POST /api/auth/login        # Login (email + password)
+GET  /api/raids/{raidId}    # Get raid details
+GET  /api/auction-wins      # Get auction wins history
 ```
 
 ### Bot Endpoints (for Discord integration)
@@ -169,7 +191,7 @@ GET  /api/bot/dkp           # Get all player DKP (simplified)
 GET  /api/bot/dkp/{userId}  # Get specific player DKP
 ```
 
-### Admin Endpoints (requires authentication)
+### Admin Endpoints (requires `admin`)
 
 ```
 POST /api/raids             # Upload raid attendance
@@ -191,11 +213,16 @@ const { userId, name, dkp } = await player.json()
 
 ## Authentication
 
-Default login (change in production!):
-- Email: One of the emails in `ADMIN_EMAILS`
-- Password: Value of `ADMIN_PASSWORD`
+Login flow:
+- User signs in with Discord OAuth
+- API reads guild membership and Discord role IDs
+- API maps Discord role IDs to app roles: `member` and `admin`
+- Users without mapped role are redirected to `/pending`
 
-**⚠️ IMPORTANT:** Change `JWT_SECRET` and `ADMIN_PASSWORD` before deploying to production!
+Production mode settings:
+- `AUTH_PROVIDER=discord`
+- `VITE_AUTH_PROVIDER=discord`
+- `AUTH_ALLOW_SWA_FALLBACK=false`
 
 ## Data Model
 

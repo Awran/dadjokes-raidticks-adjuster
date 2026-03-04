@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 
+const AUTH_PROVIDER = String(import.meta.env.VITE_AUTH_PROVIDER || 'swa').toLowerCase()
+const IS_DISCORD_LOGIN = AUTH_PROVIDER === 'discord' || AUTH_PROVIDER === 'hybrid'
+
 const Login = ({ onSuccess }) => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { login, accessDenied, accessDeniedMessage } = useAuth()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -27,9 +30,19 @@ const Login = ({ onSuccess }) => {
     <div className="login">
       <div className="login__card">
         <h2>Sign In</h2>
-        <p>Use your Microsoft account. Admin features unlock automatically when your account has the <strong>admin</strong> role.</p>
+        <p>
+          {IS_DISCORD_LOGIN
+            ? 'Use your Discord account. Admin features unlock automatically when your Discord roles map to the app admin role.'
+            : 'Use your Microsoft account. Admin features unlock automatically when your account has the admin role.'}
+        </p>
         
         <form onSubmit={handleSubmit}>
+          {accessDenied && (
+            <div className="notice notice--error">
+              {accessDeniedMessage || 'Access denied. Your Discord account is not in a mapped member/admin role. Contact guild admins for access.'}
+            </div>
+          )}
+
           {error && (
             <div className="notice notice--error">
               {error}
@@ -37,7 +50,7 @@ const Login = ({ onSuccess }) => {
           )}
 
           <button type="submit" className="button" disabled={loading}>
-            {loading ? 'Redirecting...' : 'Continue with Microsoft'}
+            {loading ? 'Redirecting...' : IS_DISCORD_LOGIN ? 'Continue with Discord' : 'Continue with Microsoft'}
           </button>
         </form>
       </div>

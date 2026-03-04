@@ -44,7 +44,7 @@ Once deployed, click **"Go to resource"**:
    **Container 4: Bids**
    - Database id: Use existing `DkpDatabase`
    - Container id: `bids`
-   - Partition key: `/playerId`
+   - Partition key: `/raidId`
    
    **Container 5: Users**
    - Database id: Use existing `DkpDatabase`
@@ -76,8 +76,8 @@ Once deployed, click **"Go to resource"**:
 ### Step 5: Test
 
 1. Go to your site: https://YOUR-APP.azurestaticapps.net
-2. Login with your admin credentials
-3. Try uploading the CSV again - should work now!
+2. Sign in with Discord using a user mapped to `member` or `admin`
+3. Try uploading the CSV with an `admin`-mapped user - should work now!
 
 ## Cost Estimate
 
@@ -89,7 +89,7 @@ With Serverless Cosmos DB:
 ## Troubleshooting
 
 ### "Already logged in" but still see error
-Clear your browser cache and login again.
+Clear your browser cache and sign in again.
 
 ### Container creation fails
 Make sure you're using **Serverless** capacity mode, not Provisioned.

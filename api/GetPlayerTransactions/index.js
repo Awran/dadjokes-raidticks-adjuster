@@ -1,7 +1,7 @@
 require('../lib/ensureCrypto')
 const { CosmosClient } = require('@azure/cosmos')
 const { randomUUID } = require('crypto')
-const { requireAdminRole } = require('../lib/swaAuth')
+const { requireAdminRole, requireMemberRole } = require('../lib/swaAuth')
 
 let cosmosClient, playersContainer, transactionsContainer, raidsContainer
 
@@ -61,6 +61,11 @@ async function getRaidNameMap(transactions, raidsContainerRef) {
 
 module.exports = async function (context, req) {
   try {
+    const principalForRead = requireMemberRole(context, req)
+    if (!principalForRead) {
+      return
+    }
+
     const method = (req.method || 'GET').toUpperCase()
     const playerId = req.params.playerId
 
